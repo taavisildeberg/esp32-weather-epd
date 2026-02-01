@@ -213,7 +213,7 @@ bool loadConfig(WeatherConfig &config) {
     return false;
   }
 
-  JsonDocument doc;
+  StaticJsonDocument<1024> doc;
   DeserializationError error = deserializeJson(doc, file);
   file.close();
 
@@ -244,7 +244,7 @@ bool loadConfig(WeatherConfig &config) {
 }
 
 bool saveConfig(const WeatherConfig &config) {
-  JsonDocument doc;
+  StaticJsonDocument<1024> doc;
   
   doc["wifi_ssid"] = config.wifi_ssid;
   doc["wifi_password"] = config.wifi_password;
@@ -297,9 +297,14 @@ void startConfigPortal() {
   
   Serial.println("WiFi connected via config portal");
   
-  // Save WiFi credentials to config
+  // Save WiFi SSID to config
+  // Note: WiFi password may not be retrievable via WiFi.psk() on all ESP32 boards
+  // Users should configure WiFi credentials via the web interface for reliability
   strlcpy(currentConfig.wifi_ssid, WiFi.SSID().c_str(), sizeof(currentConfig.wifi_ssid));
-  strlcpy(currentConfig.wifi_password, WiFi.psk().c_str(), sizeof(currentConfig.wifi_password));
+  String psk = WiFi.psk();
+  if (psk.length() > 0) {
+    strlcpy(currentConfig.wifi_password, psk.c_str(), sizeof(currentConfig.wifi_password));
+  }
   
   // Start web server for additional configuration
   startWebServer();
@@ -308,8 +313,8 @@ void startConfigPortal() {
   Serial.print("http://");
   Serial.println(WiFi.localIP());
   
-  // Keep server running until user is done
-  // This would be handled by the main loop checking for completion
+  // Keep server running until user saves configuration and restarts
+  // The web interface includes a restart button
 }
 
 void startWebServer() {
@@ -326,7 +331,7 @@ void startWebServer() {
   
   // Get current configuration
   webServer->on("/config", HTTP_GET, [](AsyncWebServerRequest *request) {
-    JsonDocument doc;
+    StaticJsonDocument<1024> doc;
     
     doc["wifi_ssid"] = currentConfig.wifi_ssid;
     // Don't send password for security
@@ -351,7 +356,7 @@ void startWebServer() {
   // Save configuration
   webServer->on("/config", HTTP_POST, [](AsyncWebServerRequest *request) {}, NULL,
     [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
-      JsonDocument doc;
+      StaticJsonDocument<1024> doc;
       DeserializationError error = deserializeJson(doc, data);
       
       if (error) {

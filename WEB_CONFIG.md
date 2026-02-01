@@ -18,6 +18,7 @@ This ESP32 weather display now includes a web configuration portal that allows y
    - A captive portal will automatically open (or navigate to http://192.168.4.1)
    - Select your WiFi network and enter the password
    - You'll be redirected to the configuration page
+   - **Important**: After connecting via WiFiManager, re-enter your WiFi credentials in the web interface and save to ensure they persist correctly
 
 2. **Manual Configuration Mode**:
    - Press and hold the BOOT button (GPIO0) while powering on the device
@@ -79,7 +80,7 @@ If no saved configuration is found, the device will use the defaults specified i
 - WiFi SSID: "ssid"
 - WiFi Password: "password"
 - Location: New York (40.7128, -74.0060)
-- API Key: "abcdefghijklmnopqrstuvwxyz012345" (invalid, you must replace this)
+- API Key: "abcdefghijklmnopqrstuvwxyz012345" (this is just an example - you **must** obtain your own valid API key from [OpenWeatherMap.org](https://openweathermap.org/api))
 - Update Interval: 30 minutes
 - Bed Time: 00:00 (midnight)
 - Wake Time: 06:00 (6 AM)

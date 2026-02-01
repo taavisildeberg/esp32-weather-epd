@@ -171,11 +171,7 @@ void setup()
   if (isConfigButtonPressed()) {
     Serial.println("Config button pressed, entering configuration mode");
     startConfigPortal();
-    // This will stay in config mode until user completes setup
-    // After configuration, device will restart
-    while (true) {
-      delay(100);
-    }
+    // Device will restart after configuration is complete
   }
 
   // Open namespace for read/write to non-volatile storage
