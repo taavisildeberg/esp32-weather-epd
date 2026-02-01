@@ -27,6 +27,7 @@
 #include "api_response.h"
 #include "client_utils.h"
 #include "config.h"
+#include "config_manager.h"
 #include "display_utils.h"
 #include "icons/icons_196x196.h"
 #include "renderer.h"
@@ -67,28 +68,31 @@ void beginDeepSleep(unsigned long startTime, tm *timeInfo)
   // additional time due to bedtime.
   // i.e. when curHour == 0, then timeInfo->tm_hour == WAKE_TIME
   int bedtimeHour = INT_MAX;
-  if (BED_TIME != WAKE_TIME)
+  int currentBedTime = getBedTime();
+  int currentWakeTime = getWakeTime();
+  if (currentBedTime != currentWakeTime)
   {
-    bedtimeHour = (BED_TIME - WAKE_TIME + 24) % 24;
+    bedtimeHour = (currentBedTime - currentWakeTime + 24) % 24;
   }
 
   // time is relative to wake time
-  int curHour = (timeInfo->tm_hour - WAKE_TIME + 24) % 24;
+  int curHour = (timeInfo->tm_hour - currentWakeTime + 24) % 24;
   const int curMinute = curHour * 60 + timeInfo->tm_min;
   const int curSecond = curHour * 3600
                       + timeInfo->tm_min * 60
                       + timeInfo->tm_sec;
-  const int desiredSleepSeconds = SLEEP_DURATION * 60;
-  const int offsetMinutes = curMinute % SLEEP_DURATION;
+  const int currentSleepDuration = getSleepDuration();
+  const int desiredSleepSeconds = currentSleepDuration * 60;
+  const int offsetMinutes = curMinute % currentSleepDuration;
   const int offsetSeconds = curSecond % desiredSleepSeconds;
 
   // align wake time to nearest multiple of SLEEP_DURATION
-  int sleepMinutes = SLEEP_DURATION - offsetMinutes;
+  int sleepMinutes = currentSleepDuration - offsetMinutes;
   if (desiredSleepSeconds - offsetSeconds < 120
    || offsetSeconds / (float)desiredSleepSeconds > 0.95f)
   { // if we have a sleep time less than 2 minutes OR less 5% SLEEP_DURATION,
     // skip to next alignment
-    sleepMinutes += SLEEP_DURATION;
+    sleepMinutes += currentSleepDuration;
   }
 
   // estimated wake time, if this falls in a sleep period then sleepDuration
@@ -135,6 +139,44 @@ void setup()
 #endif
 
   disableBuiltinLED();
+
+  // Initialize configuration manager
+  initConfigManager();
+  
+  // Load saved configuration
+  WeatherConfig &config = getCurrentConfig();
+  if (!loadConfig(config)) {
+    Serial.println("No saved configuration found, using defaults from config.cpp");
+  } else {
+    // Apply loaded configuration
+    if (strlen(config.wifi_ssid) > 0) {
+      setWiFiSSID(String(config.wifi_ssid));
+      setWiFiPassword(String(config.wifi_password));
+    }
+    if (strlen(config.latitude) > 0) {
+      setLatitude(String(config.latitude));
+      setLongitude(String(config.longitude));
+      setCityString(String(config.city_name));
+    }
+    if (strlen(config.owm_apikey) > 0) {
+      setOWMApiKey(String(config.owm_apikey));
+    }
+    setSleepDuration(config.sleep_duration);
+    setBedTime(config.bed_time);
+    setWakeTime(config.wake_time);
+    Serial.println("Configuration loaded and applied");
+  }
+
+  // Check if config button is pressed to enter configuration mode
+  if (isConfigButtonPressed()) {
+    Serial.println("Config button pressed, entering configuration mode");
+    startConfigPortal();
+    // This will stay in config mode until user completes setup
+    // After configuration, device will restart
+    while (true) {
+      delay(100);
+    }
+  }
 
   // Open namespace for read/write to non-volatile storage
   prefs.begin(NVS_NAMESPACE, false);
@@ -350,9 +392,9 @@ void setup()
                           owm_air_pollution, inTemp, inHumidity);
     drawOutlookGraph(owm_onecall.hourly, owm_onecall.daily, timeInfo);
     drawForecast(owm_onecall.daily, timeInfo);
-    drawLocationDate(CITY_STRING, dateStr);
+    drawLocationDate(getCityString(), dateStr);
 #if DISPLAY_ALERTS
-    drawAlerts(owm_onecall.alerts, CITY_STRING, dateStr);
+    drawAlerts(owm_onecall.alerts, getCityString(), dateStr);
 #endif
     drawStatusBar(statusStr, refreshTimeStr, wifiRSSI, batteryVoltage);
   } while (display.nextPage());

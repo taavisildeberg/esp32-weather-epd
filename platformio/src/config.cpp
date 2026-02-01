@@ -164,3 +164,88 @@ const uint32_t MIN_BATTERY_VOLTAGE = 3000; // (millivolts)
 // ALERTS
 // BATTERY MONITORING
 
+// Runtime configuration overrides
+static String runtime_wifi_ssid = "";
+static String runtime_wifi_password = "";
+static String runtime_lat = "";
+static String runtime_lon = "";
+static String runtime_city = "";
+static String runtime_owm_apikey = "";
+static int runtime_sleep_duration = -1;
+static int runtime_bed_time = -1;
+static int runtime_wake_time = -1;
+
+// Getters with override support
+const char* getWiFiSSID() {
+  return runtime_wifi_ssid.isEmpty() ? WIFI_SSID : runtime_wifi_ssid.c_str();
+}
+
+const char* getWiFiPassword() {
+  return runtime_wifi_password.isEmpty() ? WIFI_PASSWORD : runtime_wifi_password.c_str();
+}
+
+String getLatitude() {
+  return runtime_lat.isEmpty() ? LAT : runtime_lat;
+}
+
+String getLongitude() {
+  return runtime_lon.isEmpty() ? LON : runtime_lon;
+}
+
+String getCityString() {
+  return runtime_city.isEmpty() ? CITY_STRING : runtime_city;
+}
+
+String getOWMApiKey() {
+  return runtime_owm_apikey.isEmpty() ? OWM_APIKEY : runtime_owm_apikey;
+}
+
+int getSleepDuration() {
+  return runtime_sleep_duration >= 0 ? runtime_sleep_duration : SLEEP_DURATION;
+}
+
+int getBedTime() {
+  return runtime_bed_time >= 0 ? runtime_bed_time : BED_TIME;
+}
+
+int getWakeTime() {
+  return runtime_wake_time >= 0 ? runtime_wake_time : WAKE_TIME;
+}
+
+// Setters for runtime configuration
+void setWiFiSSID(const String& ssid) {
+  runtime_wifi_ssid = ssid;
+}
+
+void setWiFiPassword(const String& password) {
+  runtime_wifi_password = password;
+}
+
+void setLatitude(const String& lat) {
+  runtime_lat = lat;
+}
+
+void setLongitude(const String& lon) {
+  runtime_lon = lon;
+}
+
+void setCityString(const String& city) {
+  runtime_city = city;
+}
+
+void setOWMApiKey(const String& apikey) {
+  runtime_owm_apikey = apikey;
+}
+
+void setSleepDuration(int duration) {
+  runtime_sleep_duration = duration;
+}
+
+void setBedTime(int hour) {
+  runtime_bed_time = hour;
+}
+
+void setWakeTime(int hour) {
+  runtime_wake_time = hour;
+}
+
