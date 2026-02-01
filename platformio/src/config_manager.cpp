@@ -84,6 +84,7 @@ const char CONFIG_HTML[] PROGMEM = R"rawliteral(
 
     <div class="section">
       <h2>Units</h2>
+      <p style="color: #666; font-size: 0.9em;"><strong>Note:</strong> Unit changes require firmware recompilation. These settings are saved for reference but won't affect the display until you update the #define macros in config.h and rebuild.</p>
       <label>Temperature:</label>
       <select id="temp_unit" name="temp_unit">
         <option value="CELSIUS">Celsius</option>

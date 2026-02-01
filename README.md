@@ -18,6 +18,8 @@ A low-power weather display using a wifi-enabled ESP32 microcontroller and a 7.5
 
 - Customizable display: Supports multiple languages, units, time/date formats, AQI scales, personalization options, and much more.
 
+- **Web Configuration Portal**: Configure WiFi, location, API keys, and display settings through a user-friendly web interface without reflashing firmware. See [WEB_CONFIG.md](WEB_CONFIG.md) for details.
+
 - Easy recharging: USB-C charging with battery monitoring.
 
 The hourly outlook graph (bottom right) shows a line indicating temperature and shaded bars indicating probability of precipitation (or optionally volume of precipitation).
@@ -39,6 +41,7 @@ Here are two (slightly outdated) examples utilizing various configuration option
   - [Wiring](#wiring)
   - [Configuration, Compilation, and Upload](#configuration-compilation-and-upload)
   - [OpenWeatherMap API Key](#openweathermap-api-key)
+  - [Web Configuration Portal](WEB_CONFIG.md)
 - [Error Messages and Troubleshooting](#error-messages-and-troubleshooting)
   - [Low Battery](#low-battery)
   - [WiFi Connection](#wifi-connection)
