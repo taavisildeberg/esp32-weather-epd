@@ -58,8 +58,8 @@
 wl_status_t startWiFi(int &wifiRSSI)
 {
   WiFi.mode(WIFI_STA);
-  Serial.printf("%s '%s'", TXT_CONNECTING_TO, WIFI_SSID);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.printf("%s '%s'", TXT_CONNECTING_TO, getWiFiSSID());
+  WiFi.begin(getWiFiSSID(), getWiFiPassword());
 
   // timeout if WiFi does not connect in WIFI_TIMEOUT ms from now
   unsigned long timeout = millis() + WIFI_TIMEOUT;
@@ -81,7 +81,7 @@ wl_status_t startWiFi(int &wifiRSSI)
   }
   else
   {
-    Serial.printf("%s '%s'\n", TXT_COULD_NOT_CONNECT_TO, WIFI_SSID);
+    Serial.printf("%s '%s'\n", TXT_COULD_NOT_CONNECT_TO, getWiFiSSID());
   }
   return connection_status;
 } // startWiFi
@@ -153,7 +153,7 @@ bool waitForSNTPSync(tm *timeInfo)
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
   String uri = "/data/" + OWM_ONECALL_VERSION
-               + "/onecall?lat=" + LAT + "&lon=" + LON + "&lang=" + OWM_LANG
+               + "/onecall?lat=" + getLatitude() + "&lon=" + getLongitude() + "&lang=" + OWM_LANG
                + "&units=standard&exclude=minutely";
 #if !DISPLAY_ALERTS
   // exclude alerts
@@ -164,7 +164,7 @@ bool waitForSNTPSync(tm *timeInfo)
   // censored to reduce the risk of users exposing their key.
   String sanitizedUri = OWM_ENDPOINT + uri + "&appid={API key}";
 
-  uri += "&appid=" + OWM_APIKEY;
+  uri += "&appid=" + getOWMApiKey();
 
   Serial.print(TXT_ATTEMPTING_HTTP_REQ);
   Serial.println(": " + sanitizedUri);
@@ -229,13 +229,13 @@ bool waitForSNTPSync(tm *timeInfo)
   char startStr[22];
   sprintf(endStr, "%lld", end);
   sprintf(startStr, "%lld", start);
-  String uri = "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON
+  String uri = "/data/2.5/air_pollution/history?lat=" + getLatitude() + "&lon=" + getLongitude()
                + "&start=" + startStr + "&end=" + endStr
-               + "&appid=" + OWM_APIKEY;
+               + "&appid=" + getOWMApiKey();
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
   String sanitizedUri = OWM_ENDPOINT +
-               "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON
+               "/data/2.5/air_pollution/history?lat=" + getLatitude() + "&lon=" + getLongitude()
                + "&start=" + startStr + "&end=" + endStr
                + "&appid={API key}";
 

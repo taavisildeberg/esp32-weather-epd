@@ -364,6 +364,26 @@ extern const unsigned long VERY_LOW_BATTERY_SLEEP_INTERVAL;
 extern const uint32_t MAX_BATTERY_VOLTAGE;
 extern const uint32_t MIN_BATTERY_VOLTAGE;
 
+// Runtime configuration override functions
+const char* getWiFiSSID();
+const char* getWiFiPassword();
+String getLatitude();
+String getLongitude();
+String getCityString();
+String getOWMApiKey();
+int getSleepDuration();
+int getBedTime();
+int getWakeTime();
+void setWiFiSSID(const String& ssid);
+void setWiFiPassword(const String& password);
+void setLatitude(const String& lat);
+void setLongitude(const String& lon);
+void setCityString(const String& city);
+void setOWMApiKey(const String& apikey);
+void setSleepDuration(int duration);
+void setBedTime(int hour);
+void setWakeTime(int hour);
+
 // CONFIG VALIDATION - DO NOT MODIFY
 #if !(  defined(DISP_BW_V2)  \
       ^ defined(DISP_3C_B)   \
